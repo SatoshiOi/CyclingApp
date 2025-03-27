@@ -1,0 +1,29 @@
+<h1>ルート一覧</h1>
+
+<%= link_to "新規ルート作成", new_route_path %>
+
+<table border="1">
+  <tr>
+    <th>タイトル</th>
+    <th>距離</th>
+    <th>開始地点</th>
+    <th>終了地点</th>
+    <th></th>
+    <th></th>
+  </tr>
+
+  <% @routes.each do |route| %>
+    <tr>
+      <td><%= route.title %></td>
+      <td><%= route.distance %> km</td>
+      <td><%= route.start_location %></td>
+      <td><%= route.end_location %></td>
+      <td><%= link_to "詳細", route_path(route) %></td>
+      <td>
+        <%= button_to "削除", route_path(route),
+                    method: :delete,
+                    data: { confirm: "本当に削除しますか？" } %>
+      </td>
+    </tr>
+  <% end %>
+</table>

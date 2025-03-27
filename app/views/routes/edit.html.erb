@@ -1,0 +1,72 @@
+<h1>ルート編集</h1>
+
+<%= form_with(model: @route, local: true) do |f| %>
+  <p>
+    <%= f.label :title, "タイトル" %><br>
+    <%= f.text_field :title %>
+  </p>
+
+  <p>
+    <%= f.label :description, "説明" %><br>
+    <%= f.text_area :description %>
+  </p>
+
+  <p>
+    <%= f.label :distance, "距離(km)" %><br>
+    <%= f.number_field :distance %>
+  </p>
+
+  <p>
+    <%= f.label :start_location, "開始地点" %><br>
+    <%= f.text_field :start_location %>
+  </p>
+
+  <p>
+    <%= f.label :end_location, "終了地点" %><br>
+    <%= f.text_field :end_location %>
+  </p>
+
+  <!-- app/views/routes/_form.html.erb (部分テンプレート化している場合) -->
+<p>
+  <%= f.label :latitude, "緯度" %><br>
+  <%= f.number_field :latitude, step: 0.000001 %>
+</p>
+
+<p>
+  <%= f.label :longitude, "経度" %><br>
+  <%= f.number_field :longitude, step: 0.000001 %>
+</p>
+ <!-- ★ 開始地点（start_lat, start_lng） -->
+  <p>
+    <%= f.label :start_lat, "始点 緯度" %><br>
+    <%= f.number_field :start_lat, step: 0.000001, id: "startLat" %>
+  </p>
+
+  <p>
+    <%= f.label :start_lng, "始点 経度" %><br>
+    <%= f.number_field :start_lng, step: 0.000001, id: "startLng" %>
+  </p>
+
+  <!-- ★ 終了地点（end_lat, end_lng） -->
+  <p>
+    <%= f.label :end_lat, "終点 緯度" %><br>
+    <%= f.number_field :end_lat, step: 0.000001, id: "endLat" %>
+  </p>
+
+  <p>
+    <%= f.label :end_lng, "終点 経度" %><br>
+    <%= f.number_field :end_lng, step: 0.000001, id: "endLng" %>
+  </p>
+
+  <!-- ルートを描画ボタン -->
+  <button id="drawRoute" type="button">ルートを描画</button>
+
+
+
+
+  <p>
+    <%= f.submit "更新" %>
+  </p>
+<% end %>
+
+<%= link_to "一覧に戻る", routes_path %>

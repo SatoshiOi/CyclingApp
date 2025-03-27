@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title><%= content_for(:title) || "Myapp" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+     <!-- Leaflet CSS (CDN) -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
+    />
+
+     <!-- (2) Leaflet Routing Machine CSS -->
+    <link
+      rel="stylesheet"
+      href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
+    />
+
+
+    <%= yield :head %>
+
+    <link rel="manifest" href="/manifest.json">
+    <link rel="icon" href="/icon.png" type="image/png">
+    <link rel="icon" href="/icon.svg" type="image/svg+xml">
+    <link rel="apple-touch-icon" href="/icon.png">
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body>
+    <header>
+      <nav>
+        <!-- ヘッダーにルート一覧リンクを追加 -->
+        <%= link_to "ルート一覧", routes_path %>
+      </nav>
+      <nav>
+      <%= link_to "お気に入り一覧", favorites_path if user_signed_in? %>
+      <% if user_signed_in? %>
+  <%= link_to "アカウント編集", edit_user_registration_path %>
+<% end %>
+
+      </nav>
+    </header>
+
+    <% if user_signed_in? %>
+      <p>こんにちは、<%= current_user.email %> さん！</p>
+      <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
+    <% else %>
+      <p>ログインしていません。</p>
+      <%= link_to "ログイン", new_user_session_path %> |
+      <%= link_to "サインアップ", new_user_registration_path %>
+   <% end %>
+    <p class="notice"><%= notice %></p>
+    <p class="alert"><%= alert %></p>
+
+    <%= yield %>
+        <!-- Leaflet JS (CDN) -->
+    <script
+      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
+    ></script>
+    <!-- (4) Leaflet Routing Machine JS -->
+    <script
+      src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js">
+    </script>
+
+
+  <button id="drawRoute">ルートを描画</button>
+
+   <script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // ボタン要素を取得
+    const drawRouteBtn = document.getElementById('drawRoute');
+
+    if (drawRouteBtn) {
+      drawRouteBtn.addEventListener('click', function () {
+        // フォームの入力値を取得
+        const startLatInput = document.getElementById('startLat');
+        const startLngInput = document.getElementById('startLng');
+        const endLatInput = document.getElementById('endLat');
+        const endLngInput = document.getElementById('endLng');
+
+        // 要素が存在するかチェック
+        if (!startLatInput || !startLngInput || !endLatInput || !endLngInput) {
+          console.error('入力フィールドが見つかりません。');
+          return;
+        }
+
+        const startLat = parseFloat(startLatInput.value);
+        const startLng = parseFloat(startLngInput.value);
+        const endLat = parseFloat(endLatInput.value);
+        const endLng = parseFloat(endLngInput.value);
+
+        // 数値が正しく入力されているかをチェック
+        if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
+          alert('すべての値に正しい数値を入力してください。');
+          return;
+        }
+
+        // Leaflet マップのチェック
+        if (typeof map === "undefined") {
+          console.error('Leaflet のマップが初期化されていません。');
+          return;
+        }
+
+        // 始点と終点の座標を配列にまとめる
+        const routeCoordinates = [
+          [startLat, startLng],
+          [endLat, endLng]
+        ];
+
+        // もし以前に描画されたポリラインがあれば削除
+        if (window.currentPolyline) {
+          map.removeLayer(window.currentPolyline);
+        }
+
+        // // ポリライン（ルート線）を作成してマップに追加
+        // const polyline = L.polyline(routeCoordinates, { color: 'blue' }).addTo(map);
+        // window.currentPolyline = polyline; // 削除用に保存
+
+        // ルート全体が見えるようにマップの表示範囲を調整
+        map.fitBounds(polyline.getBounds());
+      });
+    } else {
+      console.error("ボタン要素が見つかりません: drawRoute");
+    }
+  });
+</script>
+   </body>
+</html>

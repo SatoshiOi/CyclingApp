@@ -1,0 +1,8 @@
+<!-- app/views/profiles/favorites.html.erb -->
+<h1>お気に入りルート一覧</h1>
+
+<% @favorite_routes.each do |route| %>
+  <div>
+    <%= link_to route.title, route_path(route) %>
+  </div>
+<% end %>

@@ -1,0 +1,115 @@
+<h2>ルート詳細</h2>
+<p>
+  タイトル: <%= @route.title %><br>
+  説明: <%= @route.description %><br>
+  距離: <%= @route.distance %> km<br>
+  開始地点: <%= @route.start_location %><br>
+  終了地点: <%= @route.end_location %><br>
+  お気に入り数：<%= @route.favorites_count %>
+</p>
+
+<!-- 地図を表示する要素。大きさをCSSで指定 -->
+<div id="map" style="height: 400px;"></div>
+
+<%= link_to "編集", edit_route_path(@route) %> |
+<%= link_to "一覧に戻る", routes_path %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function() {
+    if (window.myMap) {
+      window.myMap.remove();
+    }
+
+    // 例: start_lat, start_lng, end_lat, end_lng をテーブルに持たせている想定
+    const startLat = <%= @route.start_lat || 35.681236 %>;
+    const startLng = <%= @route.start_lng || 139.767125 %>;
+    const endLat   = <%= @route.end_lat   || 35.690000 %>;
+    const endLng   = <%= @route.end_lng   || 139.770000 %>;
+
+    // 地図の中心はスタート地点に設定
+    window.myMap = L.map('map').setView([startLat, startLng], 13);
+
+    // タイルレイヤー追加
+    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      maxZoom: 19,
+      attribution: '© OpenStreetMap'
+    }).addTo(window.myMap);
+
+    // // ルートの座標を配列でまとめる (開始～終了の2点)
+    // const routeCoordinates = [
+    //   [startLat, startLng],
+    //   [endLat, endLng]
+    // ];
+
+    // // ルート線を描画
+    // const polyline = L.polyline(routeCoordinates, { color: 'blue' }).addTo(window.myMap);
+    // // ルートが全て見えるようにマップの表示範囲を合わせる
+    // window.myMap.fitBounds(polyline.getBounds());
+
+
+    // (5) Leaflet Routing Machineで「道のり」ルートを描画
+    //     デフォルトでは OSRM のデモサーバーを使用 (serviceUrl)
+    L.Routing.control({
+      waypoints: [
+        L.latLng(startLat, startLng),
+        L.latLng(endLat, endLng)
+      ],
+      serviceUrl: 'https://router.project-osrm.org/route/v1', // デモ用OSRM
+      routeWhileDragging: false // マーカーをドラッグして再計算する場合は true
+    }).addTo(window.myMap);
+
+
+    // もしスタート地点・終了地点のマーカーも表示したいなら:
+    L.marker([startLat, startLng]).addTo(window.myMap)
+      .bindPopup("スタート地点").openPopup();
+    L.marker([endLat, endLng]).addTo(window.myMap)
+      .bindPopup("ゴール地点");
+  });
+</script>
+
+<% if current_user && current_user.favorited_routes.exists?(@route.id) %>
+  <!-- お気に入り解除ボタン -->
+  <%= button_to "お気に入り解除", route_favorite_path(@route),
+        method: :delete,
+        data: { confirm: "お気に入りを解除しますか？" },
+        class: "btn btn-danger" %>
+<% else %>
+  <!-- お気に入り登録ボタン -->
+  <%= button_to "お気に入り登録", route_favorite_path(@route),
+        method: :post,
+        data: { confirm: "お気に入りに登録しますか？" },
+        class: "btn btn-primary" %>
+<% end %>
+
+<%= @route.runs.count%>人が実際に走りました！
+
+<%= form_with(url: route_runs_path(@route), method: :post, local: true) do %>
+  <%= submit_tag "走りました" %>
+<% end %>
+
+
+<!-- コメント投稿フォーム -->
+<%= form_with model: [@route, Comment.new], local: true do |f| %>
+  <div>
+    <%= f.label :content, "コメント" %><br>
+    <%= f.text_area :content, rows: 3 %>
+  </div>
+  <div>
+    <%= f.submit "コメント投稿" %>
+  </div>
+<% end %>
+
+<h2>コメント一覧</h2>
+<% @route.comments.each do |comment| %>
+  <div>
+    <strong><%= comment.user&.name || "名無し" %></strong>:
+    <%= comment.content %>
+
+    <!-- 自分のコメントだけ削除ボタンを表示（任意） -->
+    <% if comment.user_id == current_user.id %>
+      <%= button_to "削除", route_comment_path(@route, comment),
+              method: :delete,
+              data: { confirm: "本当に削除しますか？" } %>
+    <% end %>
+  </div>
+<% end %>
