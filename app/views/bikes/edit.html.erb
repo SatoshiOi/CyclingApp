@@ -1,0 +1,25 @@
+<h1>自慢の1台を編集する</h1>
+
+<%= form_with model: @bike, url: bike_path, local: true do |form| %>
+  <% if @bike.errors.any? %>
+    <div class="error-messages">
+      <ul>
+        <% @bike.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div>
+    <%= form.label :image, "自転車の写真（変更しない場合はそのままでOK）" %><br>
+    <%= form.file_field :image %>
+  </div>
+
+  <div>
+    <%= form.label :description, "こだわり・カスタムなど" %><br>
+    <%= form.text_area :description, rows: 5 %>
+  </div>
+
+  <%= form.submit "更新する！" %>
+<% end %>

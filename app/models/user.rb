@@ -12,4 +12,7 @@ class User < ApplicationRecord
 
   has_many :comments, dependent: :destroy
   has_many :runs, dependent: :destroy
+
+  has_one :bike, dependent: :destroy
+
 end

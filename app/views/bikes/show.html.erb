@@ -1,0 +1,14 @@
+<h1>あなたの自慢の1台！</h1>
+
+<% if @bike.image.attached? %>
+  <div>
+    <%= image_tag @bike.image, style: "max-width: 400px; height: auto;" %>
+  </div>
+<% else %>
+  <p>写真が登録されていません。</p>
+<% end %>
+
+<p><strong>こだわりポイント：</strong></p>
+<p><%= @bike.description.presence || "未登録です" %></p>
+
+<%= link_to "編集する", edit_bike_path, class: "btn btn-primary" %>

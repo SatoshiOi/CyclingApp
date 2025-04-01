@@ -1,0 +1,20 @@
+<h1>みんなの自慢の1台！</h1>
+
+<% @bikes.each do |bike| %>
+  <div class="bike-card">
+    <p><strong><%= bike.user.email %> さんのバイク</strong></p>
+
+    <% if bike.image.attached? %>
+      <%= image_tag bike.image, class: "bike-image" %>
+    <% end %>
+
+    <p><strong>こだわりポイント：</strong><%= bike.description %></p>
+    <hr>
+  </div>
+
+  <% if bike.user == current_user %>
+  <%= button_to '削除', bike_path, method: :delete, data: { confirm: '本当に削除しますか？' } %>
+<% end %>
+<% end %>
+
+<%= link_to "登録・編集", edit_bike_path %>

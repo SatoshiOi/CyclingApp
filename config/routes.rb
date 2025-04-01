@@ -1,22 +1,26 @@
 Rails.application.routes.draw do
+  get "bikes/new"
+  get "bikes/create"
+  get "bikes/show"
+  get "bikes/edit"
+  get "bikes/update"
   get "dashboards/show"
   devise_for :users, controllers: { registrations: "registrations" }
   get "home/index"
   root to: "home#index"
   get "dashboard", to: "dashboards#show"
   resources :routes
-  # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
-  # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
-  # Can be used by load balancers and uptime monitors to verify that the app is live.
+
+
+
   get "up" => "rails/health#show", as: :rails_health_check
 
-  # Render dynamic PWA files from app/views/pwa/*
+
   get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
   get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
 
-  # Defines the root path route ("/")
-  # root "posts#index"
+
 
 
   # ルートに対するお気に入り登録をネストさせる
@@ -48,4 +52,6 @@ resources :routes do
   resources :runs, only: [:create]
 end
 
+resource :bike, only: [:new, :create, :show, :edit, :update, :destroy]  # 単数形！1ユーザー1台限定！
+resources :bikes, only: [:index] # 一覧ページ用
 end

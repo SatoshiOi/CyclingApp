@@ -31,14 +31,22 @@
 
   <body>
     <header>
+      <% flash.each do |key, message| %>
+  <p class="flash <%= key %>"><%= message %></p>
+<% end %>
+
       <nav>
         <!-- ヘッダーにルート一覧リンクを追加 -->
         <%= link_to "ルート一覧", routes_path %>
+        <%= link_to "自転車紹介ページへ", bikes_path %>
+
       </nav>
       <nav>
       <%= link_to "お気に入り一覧", favorites_path if user_signed_in? %>
       <% if user_signed_in? %>
-  <%= link_to "アカウント編集", edit_user_registration_path %>
+      <%= link_to "アカウント編集", edit_user_registration_path %>
+      <%= link_to "お気に入りの1台を登録・再登録", new_bike_path %>
+
 <% end %>
 
       </nav>
@@ -127,5 +135,8 @@
     }
   });
 </script>
+
+    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
+
    </body>
 </html>
