@@ -51,13 +51,14 @@ class RoutesController < ApplicationController
     redirect_to routes_path, notice: "ルートを削除しました。"
   end
 
+
   # -----------------------
   private
 
   # ⑧ Strong Parameters
   def route_params
     params.require(:route).permit(:title, :description, :distance, :start_location, :end_location,
-    :latitude, :longitude, :start_lat, :start_lng, :end_lat, :end_lng)
+    :latitude, :longitude, :start_lat, :start_lng, :end_lat, :end_lng, :image)
   end
 
   def authorize_user

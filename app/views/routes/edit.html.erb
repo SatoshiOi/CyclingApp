@@ -1,6 +1,7 @@
 <h1>ルート編集</h1>
 
-<%= form_with(model: @route, local: true) do |f| %>
+<%= form_with(model: @route, local: true, html: { multipart: true }) do |f| %>
+
   <p>
     <%= f.label :title, "タイトル" %><br>
     <%= f.text_field :title %>
@@ -57,6 +58,15 @@
     <%= f.label :end_lng, "終点 経度" %><br>
     <%= f.number_field :end_lng, step: 0.000001, id: "endLng" %>
   </p>
+
+
+
+
+  <p>
+  <%= f.label :image, "ルートの写真" %><br>
+  <%= f.file_field :image %>
+  </p>
+
 
   <!-- ルートを描画ボタン -->
   <button id="drawRoute" type="button">ルートを描画</button>

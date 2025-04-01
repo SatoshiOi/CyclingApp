@@ -35,20 +35,7 @@
       attribution: '© OpenStreetMap'
     }).addTo(window.myMap);
 
-    // // ルートの座標を配列でまとめる (開始～終了の2点)
-    // const routeCoordinates = [
-    //   [startLat, startLng],
-    //   [endLat, endLng]
-    // ];
 
-    // // ルート線を描画
-    // const polyline = L.polyline(routeCoordinates, { color: 'blue' }).addTo(window.myMap);
-    // // ルートが全て見えるようにマップの表示範囲を合わせる
-    // window.myMap.fitBounds(polyline.getBounds());
-
-
-    // (5) Leaflet Routing Machineで「道のり」ルートを描画
-    //     デフォルトでは OSRM のデモサーバーを使用 (serviceUrl)
     L.Routing.control({
       waypoints: [
         L.latLng(startLat, startLng),
@@ -66,6 +53,14 @@
       .bindPopup("ゴール地点");
   });
 </script>
+
+<% if @route.image.attached? %>
+  <p>
+    <%= image_tag @route.image, class: "route-image" %>
+  </p>
+<% end %>
+
+
 
 <% if current_user && current_user.favorited_routes.exists?(@route.id) %>
   <!-- お気に入り解除ボタン -->
