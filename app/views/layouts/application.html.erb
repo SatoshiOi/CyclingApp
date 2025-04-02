@@ -32,36 +32,26 @@
   <body>
     <header>
       <% flash.each do |key, message| %>
-  <p class="flash <%= key %>"><%= message %></p>
-<% end %>
+      <p class="flash <%= key %>"><%= message %></p>
+      <% end %>
 
-      <nav>
-        <!-- ヘッダーにルート一覧リンクを追加 -->
-        <%= link_to "ルート一覧", routes_path %>
-        <%= link_to "自転車紹介ページへ", bikes_path %>
-
-      </nav>
-      <nav>
-      <%= link_to "お気に入り一覧", favorites_path if user_signed_in? %>
-      <% if user_signed_in? %>
-      <%= link_to "アカウント編集", edit_user_registration_path %>
-      <%= link_to "お気に入りの1台を登録・再登録", new_bike_path %>
-
-<% end %>
-
+      <nav class="main-nav">
+        <% if user_signed_in? %>
+          <%= link_to "ルート一覧", routes_path %>
+          <%= link_to "自転車紹介ページへ", bikes_path %>
+          <%= link_to "マイルート一覧", favorites_path %>
+          <%= link_to "マイアカウントページ", edit_user_registration_path %>
+          <%= link_to "お気に入りの1台を登録", new_bike_path %>
+          <%= button_to "ログアウト", destroy_user_session_path, method: :delete, form: { class: "logout-form" } %>
+          <span class="welcome-msg">ようこそ、<%= current_user.email %> さん！</span>
+        <% else %>
+         <%= link_to "ログイン", new_user_session_path %>
+         <%= link_to "サインアップ", new_user_registration_path %>
+       <% end %>
       </nav>
     </header>
 
-    <% if user_signed_in? %>
-      <p>こんにちは、<%= current_user.email %> さん！</p>
-      <%= button_to "ログアウト", destroy_user_session_path, method: :delete %>
-    <% else %>
-      <p>ログインしていません。</p>
-      <%= link_to "ログイン", new_user_session_path %> |
-      <%= link_to "サインアップ", new_user_registration_path %>
-   <% end %>
-    <p class="notice"><%= notice %></p>
-    <p class="alert"><%= alert %></p>
+
 
     <%= yield %>
         <!-- Leaflet JS (CDN) -->
@@ -73,68 +63,6 @@
       src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js">
     </script>
 
-
-  <button id="drawRoute">ルートを描画</button>
-
-   <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    // ボタン要素を取得
-    const drawRouteBtn = document.getElementById('drawRoute');
-
-    if (drawRouteBtn) {
-      drawRouteBtn.addEventListener('click', function () {
-        // フォームの入力値を取得
-        const startLatInput = document.getElementById('startLat');
-        const startLngInput = document.getElementById('startLng');
-        const endLatInput = document.getElementById('endLat');
-        const endLngInput = document.getElementById('endLng');
-
-        // 要素が存在するかチェック
-        if (!startLatInput || !startLngInput || !endLatInput || !endLngInput) {
-          console.error('入力フィールドが見つかりません。');
-          return;
-        }
-
-        const startLat = parseFloat(startLatInput.value);
-        const startLng = parseFloat(startLngInput.value);
-        const endLat = parseFloat(endLatInput.value);
-        const endLng = parseFloat(endLngInput.value);
-
-        // 数値が正しく入力されているかをチェック
-        if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
-          alert('すべての値に正しい数値を入力してください。');
-          return;
-        }
-
-        // Leaflet マップのチェック
-        if (typeof map === "undefined") {
-          console.error('Leaflet のマップが初期化されていません。');
-          return;
-        }
-
-        // 始点と終点の座標を配列にまとめる
-        const routeCoordinates = [
-          [startLat, startLng],
-          [endLat, endLng]
-        ];
-
-        // もし以前に描画されたポリラインがあれば削除
-        if (window.currentPolyline) {
-          map.removeLayer(window.currentPolyline);
-        }
-
-        // // ポリライン（ルート線）を作成してマップに追加
-        // const polyline = L.polyline(routeCoordinates, { color: 'blue' }).addTo(map);
-        // window.currentPolyline = polyline; // 削除用に保存
-
-        // ルート全体が見えるようにマップの表示範囲を調整
-        map.fitBounds(polyline.getBounds());
-      });
-    } else {
-      console.error("ボタン要素が見つかりません: drawRoute");
-    }
-  });
-</script>
 
     <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
 

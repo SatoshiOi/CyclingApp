@@ -71,9 +71,68 @@
 <!-- ルートを描画ボタン -->
   <button id="drawRoute" type="button">ルートを描画</button>
 
+  <div id="map" style="height: 400px; margin-top: 1rem;"></div>
+
+
   <p>
     <%= f.submit "登録" %>
   </p>
 <% end %>
 
 <%= link_to "一覧に戻る", routes_path %>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const drawRouteBtn = document.getElementById('drawRoute');
+
+     const map = L.map('map').setView([35.681236, 139.767125], 13);
+     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap'
+     }).addTo(map);
+    if (drawRouteBtn) {
+      drawRouteBtn.addEventListener('click', function () {
+        const startLatInput = document.getElementById('startLat');
+        const startLngInput = document.getElementById('startLng');
+        const endLatInput = document.getElementById('endLat');
+        const endLngInput = document.getElementById('endLng');
+
+        if (!startLatInput || !startLngInput || !endLatInput || !endLngInput) {
+          alert('必要な座標情報が入力されていません');
+          return;
+        }
+
+        const startLat = parseFloat(startLatInput.value);
+        const startLng = parseFloat(startLngInput.value);
+        const endLat = parseFloat(endLatInput.value);
+        const endLng = parseFloat(endLngInput.value);
+
+        if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
+          alert('すべての値に数値を入力してください');
+          return;
+        }
+
+        if (typeof map === "undefined") {
+          alert('マップが読み込まれていません');
+          return;
+        }
+
+        // 前のポリラインを削除
+        if (window.currentPolyline) {
+          map.removeLayer(window.currentPolyline);
+        }
+
+        // 新しいルートを描画（仮の例: 赤い線）
+        const routeCoordinates = [
+          [startLat, startLng],
+          [endLat, endLng]
+        ];
+
+        const polyline = L.polyline(routeCoordinates, { color: 'red' }).addTo(map);
+        window.currentPolyline = polyline;
+
+        map.fitBounds(polyline.getBounds());
+      });
+    }
+  });
+</script>
