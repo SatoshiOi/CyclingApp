@@ -82,57 +82,106 @@
 <%= link_to "一覧に戻る", routes_path %>
 
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-    const drawRouteBtn = document.getElementById('drawRoute');
+  document.addEventListener("turbo:load", () => {
+    const mapElement = document.getElementById("map");
+    if (!mapElement) return;
 
-    const map = L.map('map').setView([35.681236, 139.767125], 13);
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    // 古いマップの削除
+    if (window.myMap && typeof window.myMap.remove === "function") {
+      window.myMap.remove();
+    }
+
+    // 地図を初期化
+    const map = L.map("map").setView([35.681236, 139.767125], 13);
+    window.myMap = map;
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 19,
-      attribution: '© OpenStreetMap'
+      attribution: "© OpenStreetMap",
     }).addTo(map);
-    if (drawRouteBtn) {
-      drawRouteBtn.addEventListener('click', function () {
-        const startLatInput = document.getElementById('startLat');
-        const startLngInput = document.getElementById('startLng');
-        const endLatInput = document.getElementById('endLat');
-        const endLngInput = document.getElementById('endLng');
 
-        if (!startLatInput || !startLngInput || !endLatInput || !endLngInput) {
-          alert('必要な座標情報が入力されていません');
-          return;
+    // 既存データの取得
+    let waypoints = [];
+    try {
+      const hidden = document.getElementById("waypointsInput");
+      if (hidden && hidden.value) {
+        const parsed = JSON.parse(hidden.value);
+        if (Array.isArray(parsed)) {
+          waypoints = parsed;
         }
+      }
+    } catch (e) {
+      console.warn("🚫 waypoints の JSON 読み込み失敗", e);
+    }
 
-        const startLat = parseFloat(startLatInput.value);
-        const startLng = parseFloat(startLngInput.value);
-        const endLat = parseFloat(endLatInput.value);
-        const endLng = parseFloat(endLngInput.value);
+    let polyline = null;
+    let markers = [];
 
-        if (isNaN(startLat) || isNaN(startLng) || isNaN(endLat) || isNaN(endLng)) {
-          alert('すべての値に数値を入力してください');
-          return;
-        }
+    function drawPolyline() {
+      if (polyline) map.removeLayer(polyline);
 
-        if (typeof map === "undefined") {
-          alert('マップが読み込まれていません');
-          return;
-        }
+      const latlngs = waypoints.map(p => {
+        const lat = parseFloat(p.lat ?? p.latitude ?? p["lat"]);
+        const lng = parseFloat(p.lng ?? p.longitude ?? p["lng"]);
+        return (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null;
+      }).filter(p => Array.isArray(p) && p.length === 2);
 
-        // 前のポリラインを削除
-        if (window.currentPolyline) {
-          map.removeLayer(window.currentPolyline);
-        }
+      console.log("✅ 最終的なlatlngs:", latlngs);
 
-        // 新しいルートを描画（仮の例: 赤い線）
-        const routeCoordinates = [
-          [startLat, startLng],
-          [endLat, endLng]
-        ];
+      if (latlngs.length >= 2) {
+        polyline = L.polyline(latlngs, { color: "blue" }).addTo(map);
+      }
 
-        const polyline = L.polyline(routeCoordinates, { color: 'red' }).addTo(map);
-        window.currentPolyline = polyline;
-
-        map.fitBounds(polyline.getBounds());
+      // マーカーも描画（初期化後の再描画も含め）
+      markers.forEach(marker => map.removeLayer(marker));
+      markers = [];
+      latlngs.forEach((coords, index) => {
+        const marker = L.marker(coords)
+          .addTo(map)
+          .bindPopup(`地点 ${index + 1}`);
+        markers.push(marker);
       });
     }
+
+    function updateHiddenInput() {
+      const input = document.getElementById("waypointsInput");
+      if (!input) return;
+
+      const clean = waypoints.map(p => {
+        const lat = parseFloat(p.lat ?? p.latitude ?? p["lat"]);
+        const lng = parseFloat(p.lng ?? p.longitude ?? p["lng"]);
+        return (!isNaN(lat) && !isNaN(lng)) ? { lat, lng } : null;
+      }).filter(p => p !== null);
+
+      input.value = JSON.stringify(clean);
+      console.log("📦 保存直前のデータ（クリーン済）", clean);
+    }
+
+    // 地図クリックでマーカー追加
+    map.on("click", function (e) {
+      const latlng = e.latlng;
+      waypoints.push({ lat: latlng.lat, lng: latlng.lng });
+      drawPolyline();
+      updateHiddenInput();
+    });
+
+    // リセットボタン
+    const resetBtn = document.getElementById("resetRoute");
+    if (resetBtn) {
+      resetBtn.addEventListener("click", () => {
+        waypoints = [];
+        markers.forEach(m => map.removeLayer(m));
+        markers = [];
+        if (polyline) {
+          map.removeLayer(polyline);
+          polyline = null;
+        }
+        updateHiddenInput();
+      });
+    }
+
+    // 初回描画
+    drawPolyline();
+    updateHiddenInput();
   });
 </script>

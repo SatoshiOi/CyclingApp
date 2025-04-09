@@ -6,25 +6,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-     <!-- Leaflet CSS (CDN) -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css"
-    />
 
-     <!-- (2) Leaflet Routing Machine CSS -->
-    <link
-      rel="stylesheet"
-      href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css"
-    />
-
+    <!-- ✅ Leaflet関連の読み込み（routes/show, new, edit で使用） -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
 
     <%= yield :head %>
 
+    <!-- Webアプリ設定 -->
     <link rel="manifest" href="/manifest.json">
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
+
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
@@ -32,7 +26,7 @@
   <body>
     <header>
       <% flash.each do |key, message| %>
-      <p class="flash <%= key %>"><%= message %></p>
+        <p class="flash <%= key %>"><%= message %></p>
       <% end %>
 
       <nav class="main-nav">
@@ -45,26 +39,19 @@
           <%= button_to "ログアウト", destroy_user_session_path, method: :delete, form: { class: "logout-form" } %>
           <span class="welcome-msg">ようこそ、<%= current_user.email %> さん！</span>
         <% else %>
-         <%= link_to "ログイン", new_user_session_path %>
-         <%= link_to "サインアップ", new_user_registration_path %>
-       <% end %>
+          <%= link_to "ログイン", new_user_session_path %>
+          <%= link_to "サインアップ", new_user_registration_path %>
+        <% end %>
       </nav>
     </header>
 
+   <%= yield %>
 
+    <!-- ✅ Leaflet JS（routes/show, new, edit で使用） -->
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
+    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
 
-    <%= yield %>
-        <!-- Leaflet JS (CDN) -->
-    <script
-      src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"
-    ></script>
-    <!-- (4) Leaflet Routing Machine JS -->
-    <script
-      src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js">
-    </script>
+   <%= javascript_importmap_tags %>
 
-
-    <%= javascript_include_tag "application", "data-turbo-track": "reload", defer: true %>
-
-   </body>
+  </body>
 </html>

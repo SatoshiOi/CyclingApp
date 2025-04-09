@@ -9,4 +9,5 @@ class Route < ApplicationRecord
 
   has_one_attached :image
 
+  attribute :waypoints, :json, default: []
 end

@@ -34,52 +34,88 @@
     </div>
   </div>
 
+  <!-- HiddenField に JSON を埋め込む -->
+  <%= hidden_field_tag "waypoints", @waypoints.to_json, id: "waypointsInput" %>
+
+
   <!-- 地図を表示する要素。大きさをCSSで指定 -->
   <div id="map" style="height: 400px;"></div>
 
   <%= link_to "編集", edit_route_path(@route) %>
   <%= link_to "一覧に戻る", routes_path %>
 
+
   <script>
-    document.addEventListener("DOMContentLoaded", function() {
-      if (window.myMap) {
+    document.addEventListener("turbo:load", () => {
+      console.log("🌍 Turbo is working!");
+
+      const mapElement = document.getElementById("map");
+      if (!mapElement) return;
+
+      if (window.myMap && typeof window.myMap.remove === "function") {
         window.myMap.remove();
       }
 
-      const startLat = <%= @route.start_lat || 35.681236 %>;
-      const startLng = <%= @route.start_lng || 139.767125 %>;
-      const endLat = <%= @route.end_lat || 35.690000 %>;
-      const endLng = <%= @route.end_lng || 139.770000 %>;
+      const map = L.map("map").setView([35.681236, 139.767125], 13);
+      window.myMap = map;
 
-
-
-      // 地図の中心はスタート地点に設定
-      window.myMap = L.map('map').setView([startLat, startLng], 13);
-
-      // タイルレイヤー追加
-      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
         maxZoom: 19,
-        attribution: '© OpenStreetMap'
-      }).addTo(window.myMap);
+        attribution: "© OpenStreetMap",
+      }).addTo(map);
+
+      // ✅ HiddenFieldから取得
+      const hiddenInput = document.getElementById("waypointsInput");
+      let waypoints = [];
+
+      if (hiddenInput && hiddenInput.value) {
+        try {
+          const parsed = JSON.parse(hiddenInput.value);
+          if (Array.isArray(parsed)) {
+            waypoints = parsed;
+          }
+        } catch (e) {
+          console.warn("🛑 JSON parse error:", e);
+        }
+      }
+
+      let polyline = null;
+      let markers = [];
+
+      function drawPolylineAndMarkers() {
+        if (polyline) map.removeLayer(polyline);
+        markers.forEach(marker => map.removeLayer(marker));
+        markers = [];
+
+        const latlngs = waypoints
+          .map(p => {
+            const lat = parseFloat(p.lat ?? p.latitude ?? p["lat"]);
+            const lng = parseFloat(p.lng ?? p.longitude ?? p["lng"]);
+            return (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null;
+          })
+          .filter(p => Array.isArray(p) && p.length === 2);
+
+        console.log("✅ 最終的なlatlngs:", latlngs);
+
+        latlngs.forEach((coords, i) => {
+          const marker = L.marker(coords).addTo(map).bindPopup(`地点 ${i + 1}`);
+          markers.push(marker);
+        });
+
+        if (latlngs.length >= 2) {
+          polyline = L.polyline(latlngs, { color: "blue" }).addTo(map);
+        }
+      }
 
 
-      L.Routing.control({
-        waypoints: [
-          L.latLng(startLat, startLng),
-          L.latLng(endLat, endLng)
-        ],
-        serviceUrl: 'https://router.project-osrm.org/route/v1', // デモ用OSRM
-        routeWhileDragging: false // マーカーをドラッグして再計算する場合は true
-      }).addTo(window.myMap);
+      drawPolylineAndMarkers(); // ✅ 修正
 
-
-      // もしスタート地点・終了地点のマーカーも表示したいなら:
-      L.marker([startLat, startLng]).addTo(window.myMap)
-        .bindPopup("スタート地点").openPopup();
-      L.marker([endLat, endLng]).addTo(window.myMap)
-        .bindPopup("ゴール地点");
     });
   </script>
+
+
+
+
 
   <div class="comment-section">
     <div class="comment-list">
