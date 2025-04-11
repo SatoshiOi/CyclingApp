@@ -1,0 +1,41 @@
+<div style="background-image: url('/images/garage_outside_rainy.png'); background-size: cover; background-position: center;" class="min-h-screen py-12 px-4">
+  <div class="bg-[#1f1f1f]/80 max-w-3xl mx-auto p-6 rounded-xl shadow-2xl text-gray-100 border border-gray-700">
+    <h2 class="text-2xl font-bold mb-4 text-green-300 tracking-wide">
+      🛠️ あなたの愛車（カスタム工房）
+    </h2>
+
+    <p class="font-mono text-green-400 mb-1">メーカー：</p>
+    <p class="mb-3"><%= current_user.bike.brand %></p>
+
+    <p class="font-mono text-green-400 mb-1">カスタムメモ：</p>
+    <p class="mb-3 whitespace-pre-wrap"><%= current_user.bike.customization %></p>
+
+    <% if current_user.bike.image.attached? %>
+      <div class="mt-4 flex justify-center">
+        <%= image_tag current_user.bike.image, class: "max-w-md max-h-[400px] rounded border-4 border-dashed border-gray-600 shadow-xl object-contain" %>
+      </div>
+    <% end %>
+
+    <div class="mt-4 text-right">
+      <%= link_to "愛車を編集する", edit_bike_path, class: "text-sm text-blue-400 hover:underline" %>
+    </div>
+  </div>
+
+  <div class="bg-[#1f1f1f] mt-10 p-6 rounded-xl shadow-2xl text-gray-100 border border-gray-700">
+    <h2 class="text-2xl font-bold mb-4 text-green-300 tracking-wide">
+      🗺️ あなたの投稿ルート（魂の走行記録）
+    </h2>
+
+    <% if @routes.any? %>
+      <% @routes.each do |route| %>
+        <div class="mb-6 p-4 bg-[#2b2b2b] rounded-lg shadow-inner border border-gray-600">
+          <h3 class="text-xl font-semibold text-white"><%= route.title %></h3>
+          <p class="text-gray-300 mt-1 mb-2 whitespace-pre-wrap"><%= truncate(route.description, length: 80) %></p>
+          <%= link_to "詳細を見る", route_path(route), class: "text-sm text-blue-400 hover:underline" %>
+        </div>
+      <% end %>
+    <% else %>
+      <p class="text-gray-400">まだ投稿されたルートがありません。</p>
+    <% end %>
+  </div>
+</div>

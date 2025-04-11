@@ -2,7 +2,7 @@
 
 class RoutesController < ApplicationController
   # ① 一覧表示
-  before_action :authenticate_user!, only: [ :edit, :update, :destroy ]
+  before_action :authenticate_user!, only: [ :new, :create, :edit, :update, :destroy ]
   # 作成者のみ編集・削除を許可
   before_action :authorize_user, only: [ :edit, :update, :destroy ]
   def index

@@ -12,4 +12,11 @@ class ProfilesController < ApplicationController
     @favorite_routes = current_user.favorited_routes
     # ↑ ここでユーザーがお気に入り登録しているRoute一覧を取得
   end
+  def show
+    @user = current_user
+    @routes = @user.routes.order(created_at: :desc)
+    @bike = @user.bike
+  end
+
+
 end

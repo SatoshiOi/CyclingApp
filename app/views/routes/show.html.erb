@@ -1,49 +1,90 @@
 <div class="route-show-container">
-  <h2 class="section-title">ルート詳細</h2>
-  <div class="route-detail-container">
-    <% if @route.image.attached? %>
-    <div class="route-image-wrapper">
-      <%= image_tag @route.image, class: "route-image" %>
+  <div class="max-w-5xl mx-auto px-4 py-8 space-y-8">
+
+    <!-- 上部ボタン -->
+    <div class="flex justify-between items-center">
+      <%= link_to "← 一覧に戻る", routes_path, class: "text-blue-600 hover:underline" %>
+      <%= link_to "編集", edit_route_path(@route), class: "text-sm bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded" %>
     </div>
+
+    <!-- 写真 -->
+    <% if @route.image.attached? %>
+      <div class="w-full rounded-lg overflow-hidden shadow">
+        <%= image_tag @route.image.variant(resize_to_fill: [800, 400]).processed, class: "w-full h-auto object-cover" %>
+      </div>
     <% end %>
 
-    <div class="route-info">
-      <p class="route-info-title"><strong>タイトル:</strong> <%= @route.title %></p>
-      <p><strong>説明:</strong> <%= @route.description %></p>
-      <p><strong>距離:</strong> <%= @route.distance %> km</p>
-      <p><strong>開始地点:</strong> <%= @route.start_location %></p>
-      <p><strong>終了地点:</strong> <%= @route.end_location %></p>
-      <p><strong>お気に入り数:</strong> <%= @route.favorites.count %></p>
-      <% if current_user && current_user.favorited_routes.exists?(@route.id) %>
-      <!-- お気に入り解除ボタン -->
-      <%= button_to "お気に入り解除", route_favorite_path(@route),
-        method: :delete,
-        data: { confirm: "お気に入りを解除しますか？" },
-        class: "btn btn-danger" %>
-      <% else %>
-      <!-- お気に入り登録ボタン -->
-      <%= button_to "お気に入り登録", route_favorite_path(@route),
-        method: :post,
-        data: { confirm: "お気に入りに登録しますか？" },
-        class: "btn btn-primary" %>
-      <% end %>
-      <%= @route.runs.count%>人が実際に走りました！
+    <!-- ルート情報 -->
+    <div class="space-y-2">
+      <h1 class="text-2xl font-bold text-gray-800"><%= @route.title %></h1>
+      <p class="text-gray-600"><strong>説明：</strong><%= @route.description %></p>
+      <p class="text-gray-600"><strong>距離：</strong><%= @route.distance %> km</p>
+      <p class="text-gray-600"><strong>開始地点：</strong><%= @route.start_location %></p>
+      <p class="text-gray-600"><strong>終了地点：</strong><%= @route.end_location %></p>
+      <p class="text-gray-600"><strong>お気に入り数：</strong><%= @route.favorites.count %> 件</p>
+      <p class="text-gray-600"><strong>実際に走った人数：</strong><%= @route.runs.count %> 人</p>
+    </div>
+
+    <!-- お気に入り・走りました -->
+    <div class="flex flex-wrap gap-4">
+      <%# お気に入りボタン（ハートアイコン化） %>
+      <div>
+        <% if current_user && current_user.favorited_routes.exists?(@route.id) %>
+          <%= button_to route_favorite_path(@route), method: :delete, data: { confirm: "お気に入りを解除しますか？" }, class: "hover:scale-110 transition" do %>
+            <%= raw('<svg xmlns="http://www.w3.org/2000/svg" fill="#F87171" viewBox="0 0 24 24" class="w-8 h-8">
+              <path fill-rule="evenodd" d="M12.103 20.242l-.103.085-.102-.085C6.343 15.422 3 12.5 3 8.75 3 6.25 5 4.5 7.25 4.5c1.34 0 2.613.692 3.35 1.776a.75.75 0 001.2 0C13.137 5.192 14.41 4.5 15.75 4.5 18 4.5 20 6.25 20 8.75c0 3.75-3.343 6.672-7.897 11.492z" clip-rule="evenodd"/>
+            </svg>') %>
+          <% end %>
+        <% else %>
+          <%= button_to route_favorite_path(@route), method: :post, data: { confirm: "お気に入りに登録しますか？" }, class: "hover:scale-110 transition" do %>
+            <%= raw('<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-8 h-8 text-gray-400">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.014-4.5-4.5-4.5-1.443 0-2.722.687-3.57 1.75a4.496 4.496 0 00-3.57-1.75C4.514 3.75 2.5 5.765 2.5 8.25c0 3.946 3.4 6.894 8.55 11.192a.75.75 0 001.007 0C17.6 15.144 21 12.196 21 8.25z"/>
+            </svg>') %>
+          <% end %>
+        <% end %>
+      </div>
+
       <%= form_with(url: route_runs_path(@route), method: :post, local: true) do %>
-      <%= submit_tag "走りました" %>
+        <%= submit_tag "走りました", class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded" %>
       <% end %>
     </div>
+
+    <!-- 地図 -->
+    <%= hidden_field_tag "waypoints", @waypoints.to_json, id: "waypointsInput" %>
+    <div id="map" class="w-full rounded border mt-6" style="height: 400px;"></div>
+
+    <!-- コメント一覧＆投稿フォーム -->
+    <div class="max-w-4xl mx-auto mt-12">
+      <h2 class="text-xl font-bold mb-4">コメント</h2>
+
+      <div class="bg-white shadow rounded-lg p-6 space-y-4">
+
+        <!-- コメント一覧 -->
+        <% @route.comments.each do |comment| %>
+          <div class="flex justify-between items-start border-b pb-2">
+            <div>
+              <p class="font-semibold text-gray-800"><%= comment.user.email %></p>
+              <p class="text-gray-600"><%= comment.content %></p>
+
+            </div>
+            <%= button_to "削除", route_comment_path(@route, comment), method: :delete, data: { confirm: "本当に削除しますか？" }, class: "text-red-600 hover:underline" %>
+          </div>
+        <% end %>
+
+        <!-- コメント投稿フォーム -->
+        <%= form_with(model: [@route, Comment.new], local: true, class: "space-y-4") do |form| %>
+          <div>
+            <%= form.label :content, "コメント", class: "block font-semibold text-gray-700" %>
+            <%= form.text_area :content, rows: 3, class: "w-full border rounded-md p-2" %>
+          </div>
+          <div>
+            <%= form.submit "コメント投稿", class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded" %>
+          </div>
+        <% end %>
+      </div>
+</div>
+
   </div>
-
-  <!-- HiddenField に JSON を埋め込む -->
-  <%= hidden_field_tag "waypoints", @waypoints.to_json, id: "waypointsInput" %>
-
-
-  <!-- 地図を表示する要素。大きさをCSSで指定 -->
-  <div id="map" style="height: 400px;"></div>
-
-  <%= link_to "編集", edit_route_path(@route) %>
-  <%= link_to "一覧に戻る", routes_path %>
-
 
   <script>
     document.addEventListener("turbo:load", () => {
@@ -114,36 +155,4 @@
   </script>
 
 
-
-
-
-  <div class="comment-section">
-    <div class="comment-list">
-      <h2>コメント一覧</h2>
-      <% @route.comments.each do |comment| %>
-      <div class="comment-item">
-        <strong><%= comment.user&.name || "名無し" %></strong>:
-        <%= comment.content %>
-        <% if comment.user_id == current_user.id %>
-        <%= button_to "削除", route_comment_path(@route, comment),method: :delete, data: { confirm: "本当に削除しますか？" } %>
-        <% end %>
-      </div>
-      <% end %>
-    </div>
-    <% if current_user %>
-      <div class="comment-form">
-        <%= form_with model: [@route, Comment.new], local: true do |f| %>
-          <div class="form-group">
-            <%= f.label :content, "コメント" %><br>
-            <%= f.text_area :content, rows: 3 %>
-          </div>
-          <div>
-          <%= f.submit "コメント投稿", class: "btn-success" %>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="login-message">コメントを投稿するにはログインが必要です</p>
-   <% end %>
-  </div>
 </div>

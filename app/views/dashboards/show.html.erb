@@ -1,2 +1,7 @@
-<h1>ようこそロードバイクルートアプリへ!</h1>
-<p>みんなとサイクリングコースを共有して、myサイクリングロードを見つけよう</p>
+<div class="relative min-h-screen bg-cover bg-center" style="background-image: url('/images/log_in_app_img.png');">
+  <div class="absolute inset-0 z-10 flex flex-col items-center justify-center text-white">
+    <h1 class="text-5xl font-bold mb-4">魂で刻む、あなただけの道。</h1>
+    <p class="text-xl mb-6">感じた風も、景色も、心の揺れも、<br>すべてがこの地図に刻まれていく。</p>
+    <%= link_to 'ルート一覧を見る', routes_path, class: 'bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded' %>
+  </div>
+</div>

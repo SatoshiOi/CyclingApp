@@ -5,11 +5,17 @@ Rails.application.routes.draw do
   get "bikes/edit"
   get "bikes/update"
   get "dashboards/show"
-  devise_for :users, controllers: { registrations: "registrations" }
+  devise_for :users, controllers: {
+    registrations: "registrations",
+    sessions: "users/sessions"
+  }
   get "home/index"
   root to: "home#index"
   get "dashboard", to: "dashboards#show"
   resources :routes
+  get "profile", to: "profiles#show", as: "profile"
+
+
 
 
 
@@ -26,6 +32,7 @@ Rails.application.routes.draw do
   # ルートに対するお気に入り登録をネストさせる
   resources :routes do
     resource :favorite, only: [ :create, :destroy ]
+    resources :comments, only: [:create, :destroy]
   end
 
   resources :users do
@@ -35,7 +42,7 @@ Rails.application.routes.draw do
   end
 
 # 手動で作った ProfilesController に対してルートを定義
-resources :profiles, only: [] do
+resources :profiles, only: [:show] do
   member do
     get :favorites
   end

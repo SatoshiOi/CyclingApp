@@ -1,28 +1,30 @@
-<h1>あなたの自慢の1台を登録しよう！</h1>
+<div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
+  <h1 class="text-2xl font-bold text-center text-green-700">あなたのこだわりの1台を紹介しよう！</h1>
 
-<%= form_with model: @bike, url: bike_path, local: true do |form| %>
-  <% if @bike.errors.any? %>
-    <div class="error-messages">
-      <h2><%= pluralize(@bike.errors.count, "エラー") %>が発生しました:</h2>
-      <ul>
-        <% @bike.errors.full_messages.each do |message| %>
-          <li><%= message %></li>
-        <% end %>
-      </ul>
+  <%= form_with model: @bike, url: bike_path, local: true, html: { multipart: true, class: "space-y-6" } do |form| %>
+    <% if @bike.errors.any? %>
+      <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <h2 class="font-bold mb-2">エラーが発生しました：</h2>
+        <ul class="list-disc list-inside">
+          <% @bike.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div>
+      <%= form.label :image, "愛車の写真（1枚）", class: "block font-semibold mb-1" %>
+      <%= form.file_field :image, class: "w-full border rounded px-3 py-2" %>
+    </div>
+
+    <div>
+      <%= form.label :description, "こだわり・エピソードなど自由に！", class: "block font-semibold mb-1" %>
+      <%= form.text_area :description, rows: 6, class: "w-full border rounded px-3 py-2", placeholder: "例：「このサドルが世界一！」「古いけどこの子で300km走った！」など" %>
+    </div>
+
+    <div class="text-center">
+      <%= form.submit @bike.persisted? ? "更新する！" : "登録する！", class: "bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-6 rounded" %>
     </div>
   <% end %>
-
-  <div class="form-group">
-    <%= form.label :image, "自転車の写真" %><br>
-    <%= form.file_field :image %>
-  </div>
-
-  <div class="form-group">
-    <%= form.label :description, "あなたのこだわりポイントを熱く語ってください！" %><br>
-    <%= form.text_area :description, rows: 6 %>
-  </div>
-
-  <div class="form-actions">
-    <%= form.submit "登録する！" %>
-  </div>
-<% end %>
+</div>

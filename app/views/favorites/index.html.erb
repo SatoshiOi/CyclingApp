@@ -1,7 +1,25 @@
-<h1>お気に入り一覧</h1>
+<h1 class="text-2xl font-bold mb-6">お気に入りルート一覧</h1>
 
-<ul>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
   <% @favorites.each do |favorite| %>
-    <li><%= link_to favorite.route.title, route_path(favorite.route) %></li>
+    <% route = favorite.route %>
+    <div class="bg-white rounded-2xl shadow p-4 flex flex-col md:flex-row items-start">
+      <% if route.image.attached? %>
+        <%= image_tag route.image.variant(resize_to_fill: [300, 200]), class: "rounded w-full md:w-48 h-auto mb-4 md:mb-0 md:mr-4" %>
+      <% else %>
+        <div class="w-full md:w-48 h-32 bg-gray-200 flex items-center justify-center text-gray-500 mb-4 md:mb-0 md:mr-4">
+          No Image
+        </div>
+      <% end %>
+
+      <div class="flex-1">
+        <h2 class="text-xl font-semibold mb-2"><%= route.title %></h2>
+        <p class="text-sm mb-1">距離：<%= route.distance %> km</p>
+        <p class="text-sm mb-1">開始地点：<%= route.start_location %></p>
+        <p class="text-sm mb-3">終了地点：<%= route.end_location %></p>
+
+        <%= link_to "詳細", route_path(route), class: "inline-block bg-blue-500 hover:bg-blue-600 text-white text-sm px-4 py-2 rounded" %>
+      </div>
+    </div>
   <% end %>
-</ul>
+</div>

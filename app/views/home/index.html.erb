@@ -1,12 +1,12 @@
-
-<!-- 例: ホーム画面 -->
-
-<h1>サイクリングロード共有アプリ</h1>
-
-<% if user_signed_in? %>
-  <p>ログイン中のユーザーです。</p>
-  <!-- ここに「ルート一覧」へのリンクを作成 -->
-  <%= link_to "ルート一覧へ", routes_path, class: "btn btn-primary" %>
-<% else %>
-  <p>ログインしてね！</p>
-<% end %>
+<div class="relative min-h-screen bg-cover bg-center"
+     style="background-image: url('<%= current_user ? '/images/log_in_app_img.png' : '/images/log_out_app_img.png' %>');">
+  <div class="absolute inset-0 z-10 flex flex-col items-center justify-center text-white">
+    <h2 class="text-3xl md:text-5xl font-bold mb-4 text-white">
+      心がふるえる道と、出会おう。
+    </h2>
+    <p class="text-lg md:text-xl text-white mb-6">
+      この一歩が、物語の始まり。
+    </p>
+    <%= link_to 'ルート一覧を見る', routes_path, class: 'bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-6 rounded' %>
+  </div>
+</div>

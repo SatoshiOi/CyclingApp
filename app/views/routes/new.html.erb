@@ -1,86 +1,45 @@
-<h1>新規ルート作成</h1>
+<h1 class="text-2xl font-bold mb-6 text-center">新しいルートを作成</h1>
 
-<%= form_with(model: @route, local: true, html: { multipart: true }) do |f| %>
-  <%= hidden_field_tag "route[waypoints]", @route.waypoints.to_json.presence || "[]", id: "route_waypoints" %>
+<div class="max-w-2xl mx-auto px-4">
+  <%= form_with(model: @route, local: true, html: { multipart: true, class: "space-y-6" }) do |f| %>
+    <%= hidden_field_tag "route[waypoints]", @route.waypoints.to_json.presence || "[]", id: "route_waypoints" %>
 
-  <p>
-    <%= f.label :title, "タイトル" %><br>
-    <%= f.text_field :title %>
-  </p>
+    <% [:title, :description, :distance, :start_location, :end_location, :image].each do |field| %>
+      <div class="mb-4">
+        <%= f.label field, class: "block font-medium mb-1" %>
+        <% input_class = "w-full border rounded px-3 py-2" + (@route.errors[field].any? ? " border-red-500 bg-red-50" : "") %>
 
-  <p>
-    <%= f.label :description, "説明" %><br>
-    <%= f.text_area :description %>
-  </p>
+        <% if field == :description %>
+          <%= f.text_area field, rows: 4, class: input_class %>
+        <% elsif field == :image %>
+          <%= f.file_field field, class: input_class %>
+        <% elsif field == :distance %>
+          <%= f.number_field field, class: input_class %>
+        <% else %>
+          <%= f.text_field field, class: input_class %>
+        <% end %>
 
-  <p>
-    <%= f.label :distance, "距離(km)" %><br>
-    <%= f.number_field :distance %>
-  </p>
+        <% if @route.errors[field].any? %>
+          <p class="text-sm text-red-500 mt-1"><%= @route.errors.full_messages_for(field).join(", ") %></p>
+        <% end %>
+      </div>
+    <% end %>
 
-  <p>
-    <%= f.label :start_location, "開始地点" %><br>
-    <%= f.text_field :start_location %>
-  </p>
+    <div class="flex gap-4 items-center">
+      <button id="resetRoute" type="button" class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
+        地図をリセット
+      </button>
+    </div>
 
-  <p>
-    <%= f.label :end_location, "終了地点" %><br>
-    <%= f.text_field :end_location %>
-  </p>
+    <div id="map" class="rounded border mt-4" style="height: 400px;"></div>
 
-  <!-- app/views/routes/_form.html.erb (部分テンプレート化している場合) -->
-<p>
-  <%= f.label :latitude, "緯度" %><br>
-  <%= f.number_field :latitude, step: 0.000001 %>
-</p>
-
-<p>
-  <%= f.label :longitude, "経度" %><br>
-  <%= f.number_field :longitude, step: 0.000001 %>
-</p>
-
-<!-- ★ 開始地点（start_lat, start_lng） -->
-  <p>
-    <%= f.label :start_lat, "始点 緯度" %><br>
-    <%= f.number_field :start_lat, step: 0.000001, id: "startLat" %>
-  </p>
-
-  <p>
-    <%= f.label :start_lng, "始点 経度" %><br>
-    <%= f.number_field :start_lng, step: 0.000001, id: "startLng" %>
-  </p>
-
-  <!-- ★ 終了地点（end_lat, end_lng） -->
-  <p>
-    <%= f.label :end_lat, "終点 緯度" %><br>
-    <%= f.number_field :end_lat, step: 0.000001, id: "endLat" %>
-  </p>
-
-  <p>
-    <%= f.label :end_lng, "終点 経度" %><br>
-    <%= f.number_field :end_lng, step: 0.000001, id: "endLng" %>
-  </p>
+    <div>
+      <%= f.submit "登録", class: "bg-green-600 hover:bg-green-700 text-white px-6 py-2 rounded mt-6" %>
+    </div>
+  <% end %>
+</div>
 
 
-
-  <p>
-  <%= f.label :image, "ルートの写真" %><br>
-  <%= f.file_field :image %>
-  </p>
-
-
-<!-- ルートを描画ボタン -->
-  <button id="drawRoute" type="button">ルートを描画</button>
-
-  <div id="map" style="height: 400px; margin-top: 1rem;"></div>
-  <button id="resetRoute" type="button">リセット</button>
-
-
-
-  <p>
-    <%= f.submit "登録" %>
-  </p>
-<% end %>
 
 
 

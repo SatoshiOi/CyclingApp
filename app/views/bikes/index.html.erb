@@ -1,20 +1,33 @@
-<h1>みんなの自慢の1台！</h1>
+<div class="max-w-5xl mx-auto px-4 py-10">
+  <h1 class="text-2xl font-bold text-center text-green-700 mb-8">みんなの自慢の1台！</h1>
 
-<% @bikes.each do |bike| %>
-  <div class="bike-card">
-    <p><strong><%= bike.user.email %> さんのバイク</strong></p>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+    <% @bikes.each do |bike| %>
+      <div class="bg-white rounded-lg shadow-md p-4 flex flex-col justify-between">
+        <% if bike.image.attached? %>
+          <%= image_tag bike.image.variant(resize_to_fill: [400, 250]), class: "w-full h-auto rounded mb-4 object-cover" %>
+        <% end %>
 
-    <% if bike.image.attached? %>
-      <%= image_tag bike.image, class: "bike-image" %>
+        <p class="text-sm text-gray-700 mb-2">
+          <strong><%= bike.user.email %></strong> さんのバイク
+        </p>
+
+        <p class="text-gray-800 mb-4 whitespace-pre-line">
+          <%= truncate(bike.description, length: 100) %>
+        </p>
+
+        <% if bike.user == current_user %>
+          <div class="mt-auto">
+            <%= button_to "削除", bike_path, method: :delete, data: { confirm: "本当に削除しますか？" },
+                class: "text-sm bg-red-500 hover:bg-red-600 text-white px-3 py-1 rounded" %>
+          </div>
+        <% end %>
+      </div>
     <% end %>
-
-    <p><strong>こだわりポイント：</strong><%= bike.description %></p>
-    <hr>
   </div>
 
-  <% if bike.user == current_user %>
-  <%= button_to '削除', bike_path, method: :delete, data: { confirm: '本当に削除しますか？' } %>
-<% end %>
-<% end %>
-
-<%= link_to "登録・編集", edit_bike_path %>
+  <div class="text-center mt-10">
+    <%= link_to "自分のバイクを登録・編集する", edit_bike_path,
+          class: "inline-block bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded shadow font-semibold" %>
+  </div>
+</div>

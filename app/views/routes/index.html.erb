@@ -1,29 +1,39 @@
-<h1>ルート一覧</h1>
-
-<%= link_to "新規ルート作成", new_route_path %>
-
-<table border="1">
-  <tr>
-    <th>タイトル</th>
-    <th>距離</th>
-    <th>開始地点</th>
-    <th>終了地点</th>
-    <th></th>
-    <th></th>
-  </tr>
+<div class="max-w-5xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-6">
+    <h1 class="text-2xl font-bold text-gray-800">ルート一覧</h1>
+    <%= link_to "新規ルート作成", new_route_path, class: "bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded shadow" %>
+  </div>
 
   <% @routes.each do |route| %>
-    <tr>
-      <td><%= route.title %></td>
-      <td><%= route.distance %> km</td>
-      <td><%= route.start_location %></td>
-      <td><%= route.end_location %></td>
-      <td><%= link_to "詳細", route_path(route) %></td>
-      <td>
-        <%= button_to "削除", route_path(route),
-                    method: :delete,
-                    data: { confirm: "本当に削除しますか？" } %>
-      </td>
-    </tr>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+
+      <!-- 画像表示（条件付き） -->
+      <% if route.image.attached? %>
+        <div class="flex-shrink-0 w-full sm:w-48 aspect-video overflow-hidden rounded-lg shadow">
+          <%= image_tag route.image.variant(resize_to_fill: [480, 270]).processed,
+                        class: "object-cover w-full h-full" %>
+        </div>
+      <% end %>
+
+
+      <!-- テキスト情報 -->
+      <div class="flex-1">
+        <h2 class="text-xl font-semibold text-gray-800 mb-2"><%= route.title %></h2>
+        <p class="text-gray-600 mb-1"><strong>距離：</strong><%= route.distance %> km</p>
+        <p class="text-gray-600 mb-1"><strong>開始地点：</strong><%= route.start_location %></p>
+        <p class="text-gray-600"><strong>終了地点：</strong><%= route.end_location %></p>
+      </div>
+
+      <!-- アクションボタン -->
+      <div class="mt-4 sm:mt-0 flex flex-col gap-2">
+        <%= link_to "詳細", route_path(route), class: "bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded text-center" %>
+        <% if current_user && route.user_id == current_user.id %>
+          <%= button_to "削除", route_path(route),
+                method: :delete,
+                data: { confirm: "本当に削除しますか？" },
+                class: "bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded" %>
+        <% end %>
+      </div>
+    </div>
   <% end %>
-</table>
+</div>

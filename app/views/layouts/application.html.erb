@@ -19,31 +19,52 @@
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
 
-    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
-    <%= javascript_importmap_tags %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+
+    <%= javascript_include_tag "application", type: "module" %>
+
   </head>
 
   <body>
-    <header>
-      <% flash.each do |key, message| %>
-        <p class="flash <%= key %>"><%= message %></p>
-      <% end %>
+    <header class="bg-white shadow">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center py-4">
 
-      <nav class="main-nav">
+      <!-- ロゴ -->
+      <div class="flex items-center space-x-4">
+        <%= link_to root_path do %>
+          <%= image_tag "logo_soul_path2.png", alt: "魂の道しるべロゴ", class: "h-16 w-auto" %>
+        <% end %>
+      </div>
+
+      <!-- ナビゲーションメニュー -->
+      <nav class="flex space-x-6 text-lg font-medium">
+        <%= link_to "ルート一覧", routes_path, class: "hover:text-green-600" %>
+        <%= link_to "自転車紹介ページへ", bikes_path, class: "hover:text-green-600" %>
+        <%= link_to "お気に入りルート一覧", favorites_path, class: "hover:text-green-600" %>
+
         <% if user_signed_in? %>
-          <%= link_to "ルート一覧", routes_path %>
-          <%= link_to "自転車紹介ページへ", bikes_path %>
-          <%= link_to "マイルート一覧", favorites_path %>
-          <%= link_to "マイアカウントページ", edit_user_registration_path %>
-          <%= link_to "お気に入りの1台を登録", new_bike_path %>
-          <%= button_to "ログアウト", destroy_user_session_path, method: :delete, form: { class: "logout-form" } %>
-          <span class="welcome-msg">ようこそ、<%= current_user.email %> さん！</span>
+          <%= link_to "マイアカウントページ", profile_path(current_user), class: "hover:text-green-600" %>
         <% else %>
-          <%= link_to "ログイン", new_user_session_path %>
-          <%= link_to "サインアップ", new_user_registration_path %>
+          <%= link_to "ログイン", new_user_session_path, class: "hover:text-green-600" %>
+          <%= link_to "新規登録", new_user_registration_path, class: "hover:text-green-600" %>
         <% end %>
       </nav>
-    </header>
+
+      <!-- ユーザー情報 -->
+      <div class="text-right">
+        <% if user_signed_in? %>
+          <p class="text-sm text-gray-600">ようこそ、<br><%= current_user.email %> さん！</p>
+          <%= link_to "ログアウト", destroy_user_session_path, method: :delete,
+                      class: "mt-1 inline-block px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700" %>
+        <% end %>
+      </div>
+
+
+    </div>
+  </div>
+</header>
+
 
    <%= yield %>
 

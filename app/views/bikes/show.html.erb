@@ -1,14 +1,22 @@
-<h1>あなたの自慢の1台！</h1>
+<div class="max-w-3xl mx-auto px-4 py-10 space-y-8">
 
-<% if @bike.image.attached? %>
-  <div>
-    <%= image_tag @bike.image, style: "max-width: 400px; height: auto;" %>
+  <h1 class="text-2xl font-bold text-center text-green-700 mb-6">自慢の1台</h1>
+
+  <% if @bike.image.attached? %>
+    <div class="rounded overflow-hidden shadow-lg">
+      <%= image_tag @bike.image.variant(resize_to_limit: [800, 500]), class: "w-full object-cover rounded" %>
+    </div>
+  <% else %>
+    <p class="text-center text-gray-500 italic">写真が登録されていません。</p>
+  <% end %>
+
+  <div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-xl font-semibold text-gray-800 mb-4">こだわりポイント</h2>
+    <p class="text-gray-700 whitespace-pre-line"><%= @bike.description.presence || "まだこだわりが登録されていません。" %></p>
   </div>
-<% else %>
-  <p>写真が登録されていません。</p>
-<% end %>
 
-<p><strong>こだわりポイント：</strong></p>
-<p><%= @bike.description.presence || "未登録です" %></p>
+  <div class="text-center">
+    <%= link_to "編集する", edit_bike_path, class: "inline-block bg-yellow-500 hover:bg-yellow-600 text-white font-semibold py-2 px-4 rounded shadow" %>
+  </div>
 
-<%= link_to "編集する", edit_bike_path, class: "btn btn-primary" %>
+</div>
