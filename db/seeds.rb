@@ -7,3 +7,15 @@
 #   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
 #     MovieGenre.find_or_create_by!(name: genre_name)
 #   end
+
+puts "🌱 Seeding routes..."
+
+user = User.first
+
+Route.create!(
+  title: "高知の満足コース",
+  description: "海沿いを気持ちよく走っていくコース！基本は平坦だが、上りも結構あって楽しいコースだよ！！何と言っても景色が最高のコースだからぜひ走ってみてください！",
+  user: user
+)
+
+puts "✅ Route seed complete!"
