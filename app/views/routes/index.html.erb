@@ -8,17 +8,17 @@
     <div class="bg-white rounded-lg shadow-md p-6 mb-6 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
 
       <!-- 画像表示（条件付き） -->
-<% if route.image.attached? %>
-  <div class="flex-shrink-0 w-full sm:w-48 aspect-video overflow-hidden rounded-lg shadow">
-    <%= image_tag route.image.variant(resize_to_fill: [480, 270]).processed,
-                  class: "object-cover w-full h-full" %>
-  </div>
-<% else %>
-  <!-- デフォルト画像（あれば） -->
-  <div class="flex-shrink-0 w-full sm:w-48 aspect-video overflow-hidden rounded-lg shadow bg-gray-100 flex items-center justify-center text-gray-400 italic text-sm">
-    No Image
-  </div>
-<% end %>
+      <% if route.image.attached? && route.image.variable? %>
+        <div class="flex-shrink-0 w-full sm:w-48 aspect-video overflow-hidden rounded-lg shadow">
+          <%= image_tag route.image.variant(resize_to_fill: [480, 270]).processed,
+                        class: "object-cover w-full h-full" %>
+        </div>
+      <% else %>
+        <div class="flex-shrink-0 w-full sm:w-48 aspect-video overflow-hidden rounded-lg shadow bg-gray-300 flex items-center justify-center text-gray-500">
+          画像なし
+        </div>
+      <% end %>
+
 
 
 
