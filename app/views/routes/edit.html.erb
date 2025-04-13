@@ -37,7 +37,9 @@
     <%= hidden_field_tag "waypoints", @route.waypoints.to_json, id: "waypointsInput" %>
 
     <div>
-      <div id="map" class="rounded border" style="height: 400px;"></div>
+      <div id="map" data-page="edit" class="h-[400px] w-full rounded mb-4"></div>
+      <%= f.hidden_field :waypoints, id: "waypoints" %>
+
       <button id="resetRoute" type="button" class="mt-2 bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded">
         地図をリセット
       </button>
@@ -52,109 +54,3 @@
     <%= link_to "一覧に戻る", routes_path, class: "text-blue-600 hover:underline" %>
   </div>
 </div>
-
-
-<script>
-  document.addEventListener("turbo:load", () => {
-    const mapElement = document.getElementById("map");
-    if (!mapElement) return;
-
-    // 古いマップの削除
-    if (window.myMap && typeof window.myMap.remove === "function") {
-      window.myMap.remove();
-    }
-
-    // 地図を初期化
-    const map = L.map("map").setView([35.681236, 139.767125], 13);
-    window.myMap = map;
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19,
-      attribution: "© OpenStreetMap",
-    }).addTo(map);
-
-    // 既存データの取得
-    let waypoints = [];
-    try {
-      const hidden = document.getElementById("waypointsInput");
-      if (hidden && hidden.value) {
-        const parsed = JSON.parse(hidden.value);
-        if (Array.isArray(parsed)) {
-          waypoints = parsed;
-        }
-      }
-    } catch (e) {
-      console.warn("🚫 waypoints の JSON 読み込み失敗", e);
-    }
-
-    let polyline = null;
-    let markers = [];
-
-    function drawPolyline() {
-      if (polyline) map.removeLayer(polyline);
-
-      const latlngs = waypoints.map(p => {
-        const lat = parseFloat(p.lat ?? p.latitude ?? p["lat"]);
-        const lng = parseFloat(p.lng ?? p.longitude ?? p["lng"]);
-        return (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null;
-      }).filter(p => Array.isArray(p) && p.length === 2);
-
-      console.log("✅ 最終的なlatlngs:", latlngs);
-
-      if (latlngs.length >= 2) {
-        polyline = L.polyline(latlngs, { color: "blue" }).addTo(map);
-      }
-
-      // マーカーも描画（初期化後の再描画も含め）
-      markers.forEach(marker => map.removeLayer(marker));
-      markers = [];
-      latlngs.forEach((coords, index) => {
-        const marker = L.marker(coords)
-          .addTo(map)
-          .bindPopup(`地点 ${index + 1}`);
-        markers.push(marker);
-      });
-    }
-
-    function updateHiddenInput() {
-      const input = document.getElementById("waypointsInput");
-      if (!input) return;
-
-      const clean = waypoints.map(p => {
-        const lat = parseFloat(p.lat ?? p.latitude ?? p["lat"]);
-        const lng = parseFloat(p.lng ?? p.longitude ?? p["lng"]);
-        return (!isNaN(lat) && !isNaN(lng)) ? { lat, lng } : null;
-      }).filter(p => p !== null);
-
-      input.value = JSON.stringify(clean);
-      console.log("📦 保存直前のデータ（クリーン済）", clean);
-    }
-
-    // 地図クリックでマーカー追加
-    map.on("click", function (e) {
-      const latlng = e.latlng;
-      waypoints.push({ lat: latlng.lat, lng: latlng.lng });
-      drawPolyline();
-      updateHiddenInput();
-    });
-
-    // リセットボタン
-    const resetBtn = document.getElementById("resetRoute");
-    if (resetBtn) {
-      resetBtn.addEventListener("click", () => {
-        waypoints = [];
-        markers.forEach(m => map.removeLayer(m));
-        markers = [];
-        if (polyline) {
-          map.removeLayer(polyline);
-          polyline = null;
-        }
-        updateHiddenInput();
-      });
-    }
-
-    // 初回描画
-    drawPolyline();
-    updateHiddenInput();
-  });
-</script>

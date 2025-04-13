@@ -7,9 +7,11 @@
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 
-    <!-- ✅ Leaflet関連の読み込み（routes/show, new, edit で使用） -->
-    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" />
+
+    <!-- Leaflet CSSだけ読み込む -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <link rel="stylesheet" href="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.css" />
+
 
     <%= yield :head %>
 
@@ -69,8 +71,7 @@
    <%= yield %>
 
     <!-- ✅ Leaflet JS（routes/show, new, edit で使用） -->
-    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js"></script>
-    <script src="https://unpkg.com/leaflet-routing-machine@latest/dist/leaflet-routing-machine.js"></script>
+
 
    <%= javascript_importmap_tags %>
 

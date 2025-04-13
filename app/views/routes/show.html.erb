@@ -50,8 +50,9 @@
     </div>
 
     <!-- 地図 -->
-    <%= hidden_field_tag "waypoints", @waypoints.to_json, id: "waypointsInput" %>
-    <div id="map" class="w-full rounded border mt-6" style="height: 400px;"></div>
+    <div id="map" data-page="show" class="h-[400px] w-full rounded mb-4"></div>
+    <input type="hidden" id="waypointsInput" value='<%= raw(@waypoints.to_json) %>' />
+
 
     <!-- コメント一覧＆投稿フォーム -->
     <div class="max-w-4xl mx-auto mt-12">
@@ -82,77 +83,6 @@
           </div>
         <% end %>
       </div>
-</div>
-
+    </div>
   </div>
-
-  <script>
-    document.addEventListener("turbo:load", () => {
-      console.log("🌍 Turbo is working!");
-
-      const mapElement = document.getElementById("map");
-      if (!mapElement) return;
-
-      if (window.myMap && typeof window.myMap.remove === "function") {
-        window.myMap.remove();
-      }
-
-      const map = L.map("map").setView([35.681236, 139.767125], 13);
-      window.myMap = map;
-
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: "© OpenStreetMap",
-      }).addTo(map);
-
-      // ✅ HiddenFieldから取得
-      const hiddenInput = document.getElementById("waypointsInput");
-      let waypoints = [];
-
-      if (hiddenInput && hiddenInput.value) {
-        try {
-          const parsed = JSON.parse(hiddenInput.value);
-          if (Array.isArray(parsed)) {
-            waypoints = parsed;
-          }
-        } catch (e) {
-          console.warn("🛑 JSON parse error:", e);
-        }
-      }
-
-      let polyline = null;
-      let markers = [];
-
-      function drawPolylineAndMarkers() {
-        if (polyline) map.removeLayer(polyline);
-        markers.forEach(marker => map.removeLayer(marker));
-        markers = [];
-
-        const latlngs = waypoints
-          .map(p => {
-            const lat = parseFloat(p.lat ?? p.latitude ?? p["lat"]);
-            const lng = parseFloat(p.lng ?? p.longitude ?? p["lng"]);
-            return (!isNaN(lat) && !isNaN(lng)) ? [lat, lng] : null;
-          })
-          .filter(p => Array.isArray(p) && p.length === 2);
-
-        console.log("✅ 最終的なlatlngs:", latlngs);
-
-        latlngs.forEach((coords, i) => {
-          const marker = L.marker(coords).addTo(map).bindPopup(`地点 ${i + 1}`);
-          markers.push(marker);
-        });
-
-        if (latlngs.length >= 2) {
-          polyline = L.polyline(latlngs, { color: "blue" }).addTo(map);
-        }
-      }
-
-
-      drawPolylineAndMarkers(); // ✅ 修正
-
-    });
-  </script>
-
-
 </div>

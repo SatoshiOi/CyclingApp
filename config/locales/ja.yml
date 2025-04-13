@@ -13,8 +13,13 @@ ja:
         start_location: 開始地点
         end_location: 終了地点
         image: 写真
+      user:
+        password: "パスワード"
+        password_confirmation: "パスワード再入力"
+        email: "メールアドレス"
+        name: "ユーザー名"
     errors:
       messages:
-        blank: "を入力してください"
+        blank: "入力してください"
         too_short: "は%{count}文字以上で入力してください"
         not_a_number: "は数値（半角）で入力してください"

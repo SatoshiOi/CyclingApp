@@ -1,8 +1,6 @@
-import "@hotwired/turbo-rails"
-import Rails from "@rails/ujs"
-Rails.start()
+// app/javascript/application.js
 
-document.addEventListener("turbo:load", () => {
-  console.log("Turbo is working!");
-  // 地図初期化コードをここに！
-});
+import "@hotwired/turbo-rails"
+import "./routes" // Turbo:load イベントに反応する地図スクリプト
+
+console.log("✅ Turbo map script loaded");

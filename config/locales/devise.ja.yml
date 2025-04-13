@@ -8,6 +8,7 @@ ja:
         sign_up: "アカウント作成"
       edit:
         edit: "アカウント編集"
+      updated: "アカウント情報を更新しました"
     shared:
       links:
         sign_up: "新規登録"
@@ -19,8 +20,16 @@ ja:
         send_me_reset_password_instructions: "パスワード再設定のメールを送信"
       edit:
         change_my_password: "パスワード変更"
+      updated: "パスワードを更新しました"
     confirmations:
       new:
         resend_confirmation_instructions: "確認メールを再送する"
     failure:
       invalid: "メールアドレスまたはパスワードが正しくありません"
+  activerecord:
+    attributes:
+      user:
+        current_password: "現在のパスワード"
+  errors:
+    messages:
+      invalid: "正しくありません"
