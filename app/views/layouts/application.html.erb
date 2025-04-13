@@ -54,7 +54,7 @@
       <!-- ユーザー情報 -->
       <div class="text-right">
         <% if user_signed_in? %>
-          <p class="text-sm text-gray-600">ようこそ、<br><%= current_user.email %> さん！</p>
+          <p class="text-sm text-gray-600">ようこそ、<br><%= current_user.name %> さん！</p>
           <%= link_to "ログアウト", destroy_user_session_path, method: :delete,
                       class: "mt-1 inline-block px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700" %>
         <% end %>
