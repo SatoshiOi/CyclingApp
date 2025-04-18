@@ -1,64 +1,43 @@
 Rails.application.routes.draw do
-  get "bikes/new"
-  get "bikes/create"
-  get "bikes/show"
-  get "bikes/edit"
-  get "bikes/update"
-  get "dashboards/show"
+  # 🔐 Devise（ユーザー認証）
   devise_for :users, controllers: {
     registrations: "registrations",
     sessions: "users/sessions"
   }
-  get "home/index"
+
+  # 🌟 トップページ＆ダッシュボード
   root to: "home#index"
+  get "home/index"
   get "dashboard", to: "dashboards#show"
-  resources :routes
-  get "profile", to: "profiles#show", as: "profile"
 
-
-
-
-
-
-  get "up" => "rails/health#show", as: :rails_health_check
-
-
-  get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
-  get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
-
-
-
-
-  # ルートに対するお気に入り登録をネストさせる
+  # ✅ ルート（サイクリングコース）
   resources :routes do
-    resource :favorite, only: [ :create, :destroy ]
-    resources :comments, only: [:create, :destroy]
+    resource :favorite, only: [:create, :destroy]         # いいね機能（単数形で1ユーザー1いいね）
+    resources :comments, only: [:create, :destroy]        # コメント機能
+    resources :runs, only: [:create]                      # 実際に走った記録を保存
   end
 
-  resources :users do
+  # 📌 お気に入りルート一覧ページ（/favorites）
+  resources :favorites, only: [:index]  # ★これが「favorites_path」生成のカギ！
+
+  # 👤 各ユーザーのお気に入り（/users/:id/favorites）
+  resources :users, only: [] do
     member do
       get :favorites
     end
   end
 
-# 手動で作った ProfilesController に対してルートを定義
-resources :profiles, only: [:show] do
-  member do
-    get :favorites
-  end
-end
+  # 🚲 自転車情報（1人1台だけ所有可）
+  resource :bike, only: [:new, :create, :show, :edit, :update, :destroy]  # 単数形！
+  resources :bikes, only: [:index]  # 一覧ページ用（全体）
 
-resources :favorites, only: [ :index ]
+  # 👤 プロフィールページ
+  get "profile", to: "profiles#show", as: "profile"
 
+  # PWA関連
+  get "service-worker", to: "rails/pwa#service_worker", as: :pwa_service_worker
+  get "manifest", to: "rails/pwa#manifest", as: :pwa_manifest
 
-resources :routes do
-  resources :comments, only: [ :create, :destroy ]
-end
-
-resources :routes do
-  resources :runs, only: [:create]
-end
-
-resource :bike, only: [:new, :create, :show, :edit, :update, :destroy]  # 単数形！1ユーザー1台限定！
-resources :bikes, only: [:index] # 一覧ページ用
+  # ヘルスチェック
+  get "up", to: "rails/health#show", as: :rails_health_check
 end

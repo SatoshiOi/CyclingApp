@@ -1,25 +1,41 @@
 <div style="background-image: url('/images/garage_outside_rainy.png'); background-size: cover; background-position: center;" class="min-h-screen py-12 px-4">
   <div class="bg-[#1f1f1f]/80 max-w-3xl mx-auto p-6 rounded-xl shadow-2xl text-gray-100 border border-gray-700">
     <h2 class="text-2xl font-bold mb-4 text-green-300 tracking-wide">
-      🛠️ あなたの愛車（カスタム工房）
-    </h2>
+  🛠️ あなたの愛車（カスタム工房）
+</h2>
 
-    <p class="font-mono text-green-400 mb-1">メーカー：</p>
-    <p class="mb-3"><%= current_user.bike.brand %></p>
+<% if current_user.bike.present? %>
+  <p class="font-mono text-green-400 mb-1">メーカー：</p>
+  <p class="mb-3"><%= current_user.bike.brand %></p>
 
-    <p class="font-mono text-green-400 mb-1">カスタムメモ：</p>
-    <p class="mb-3 whitespace-pre-wrap"><%= current_user.bike.customization %></p>
+  <p class="font-mono text-green-400 mb-1">カスタムメモ：</p>
+  <p class="mb-3 whitespace-pre-wrap"><%= current_user.bike.customization %></p>
 
-    <% if current_user.bike.image.attached? %>
-      <div class="mt-4 flex justify-center">
-        <%= image_tag current_user.bike.image, class: "max-w-md max-h-[400px] rounded border-4 border-dashed border-gray-600 shadow-xl object-contain" %>
-      </div>
-    <% end %>
-
-    <div class="mt-4 text-right">
-      <%= link_to "愛車を編集する", edit_bike_path, class: "text-sm text-blue-400 hover:underline" %>
+  <% if current_user.bike.image.attached? %>
+    <div class="mt-4 flex justify-center">
+      <%= image_tag current_user.bike.image, class: "max-w-md max-h-[400px] rounded border-4 border-dashed border-gray-600 shadow-xl object-contain" %>
     </div>
+  <% end %>
+
+  <div class="mt-4 text-right">
+    <%= link_to "愛車を編集する", edit_bike_path, class: "text-sm text-blue-400 hover:underline" %>
   </div>
+
+<% else %>
+  <div class="text-center px-6 py-8 bg-[#2d2d2d] rounded-xl shadow-lg border border-gray-700">
+    <div class="flex justify-center mb-4">
+      <%= image_tag("no_bike_found_soul.png", alt: "未登録のバイク探しキャラ", class: "w-64 h-auto rounded-lg shadow-md") %>
+    </div>
+
+    <h3 class="text-xl font-bold text-green-300 mb-2">まだ愛車が登録されていません…</h3>
+    <p class="text-gray-300 text-sm mb-6">
+      あなたの魂を乗せる1台、ぜひ登録してみませんか？
+    </p>
+
+    <%= link_to "愛車を登録する", new_bike_path,
+      class: "inline-block px-6 py-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-full transition duration-300 ease-in-out shadow-lg" %>
+  </div>
+<% end %>
 
   <div class="bg-[#1f1f1f] mt-10 p-6 rounded-xl shadow-2xl text-gray-100 border border-gray-700">
     <h2 class="text-2xl font-bold mb-4 text-green-300 tracking-wide">

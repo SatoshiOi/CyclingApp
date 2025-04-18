@@ -31,8 +31,20 @@
       </button>
     </div>
 
+    <!-- 地図検索フォーム -->
+    <div class="mb-4">
+      <label for="place-input" class="block font-medium mb-1">地名検索</label>
+      <div class="flex gap-2">
+        <input type="text" id="place-input" placeholder="例：高知市" class="flex-1 border rounded px-3 py-2">
+        <button type="button" id="search-btn" class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded">
+          検索
+        </button>
+      </div>
+    </div>
+
     <div id="map" data-page="new" class="h-[400px] w-full rounded mb-4"></div>
     <%= f.hidden_field :waypoints, id: "waypoints" %>
+    <p id="search-message" class="text-sm text-red-600 mt-2"></p>
 
 
     <div>

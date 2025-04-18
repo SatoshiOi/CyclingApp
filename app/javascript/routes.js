@@ -124,3 +124,47 @@ document.addEventListener("turbo:load", () => {
     }
   }
 });
+
+
+document.addEventListener("turbo:load", () => {
+  const searchBtn = document.getElementById("search-btn");
+  const messageEl = document.getElementById("search-message");
+
+  console.log("メッセージ要素:", messageEl); // ← デバッグログ入れよう
+
+  if (searchBtn) {
+    searchBtn.addEventListener("click", () => {
+      const place = document.getElementById("place-input").value;
+      messageEl.textContent = "";
+
+      if (!place.trim()) {
+        messageEl.textContent = "地名を入力してください。";
+        return;
+      }
+
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(place)}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data.length === 0) {
+            messageEl.textContent = "場所が見つかりませんでした。もう一度お試しください。";
+            return;
+          }
+
+          const lat = parseFloat(data[0].lat);
+          const lon = parseFloat(data[0].lon);
+
+          if ((lat === 0 && lon === 0) || isNaN(lat) || isNaN(lon)) {
+            messageEl.textContent = "正しい位置が取得できませんでした。";
+            return;
+          }
+
+          window.myMap.setView([lat, lon], 13);
+          messageEl.textContent = "";
+        })
+        .catch(error => {
+          console.error("地名検索エラー:", error);
+          messageEl.textContent = "検索中にエラーが発生しました。";
+        });
+    });
+  }
+});
