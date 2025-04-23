@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title><%= content_for(:title) || "Myapp" %></title>
+    <title><%= content_for(:title) || "魂の道しるべ" %></title>
+    <%= favicon_link_tag 'favicon.ico' %>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <%= csrf_meta_tags %>
@@ -29,43 +30,64 @@
 
   <body>
     <header class="bg-white shadow">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex justify-between items-center py-4">
 
-      <!-- ロゴ -->
-      <div class="flex items-center space-x-4">
-        <%= link_to root_path do %>
-          <%= image_tag "logo_soul_path2.png", alt: "魂の道しるべロゴ", class: "h-16 w-auto" %>
-        <% end %>
+          <!-- ロゴ -->
+          <div class="flex items-center space-x-4">
+            <%= link_to root_path do %>
+              <%= image_tag "logo_soul_path2.png", alt: "魂の道しるべロゴ", class: "h-16 w-auto" %>
+            <% end %>
+          </div>
+
+          <!-- ハンバーガー（モバイル専用） -->
+          <div class="md:hidden">
+            <button id="menu-button" class="text-gray-800 focus:outline-none">
+              <svg class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2"
+                  viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- メニュー本体（PC表示） -->
+          <nav class="hidden md:flex space-x-6 text-lg font-medium">
+            <%= link_to "ルート一覧", routes_path, class: "hover:text-green-600" %>
+            <%= link_to "自転車紹介ページへ", bikes_path, class: "hover:text-green-600" %>
+            <%= link_to "お気に入りルート一覧", favorites_path, class: "hover:text-green-600" %>
+
+            <% if user_signed_in? %>
+              <%= link_to "マイアカウントページ", profile_path(current_user), class: "hover:text-green-600" %>
+            <% else %>
+              <%= link_to "ログイン", new_user_session_path, class: "hover:text-green-600" %>
+              <%= link_to "新規登録", new_user_registration_path, class: "hover:text-green-600" %>
+            <% end %>
+          </nav>
+        </div>
+
+        <!-- モバイル用メニュー -->
+        <div id="mobile-menu"
+          class="md:hidden hidden bg-white/90 backdrop-blur-md rounded-b-xl shadow-lg px-6 py-6 mt-2 space-y-4 text-center text-gray-800 border border-gray-300">
+
+          <%= link_to "ルート一覧", routes_path, class: "block text-base font-semibold tracking-wide hover:text-green-600 transition" %>
+          <%= link_to "自転車紹介ページへ", bikes_path, class: "block text-base font-semibold tracking-wide hover:text-green-600 transition" %>
+          <%= link_to "お気に入りルート一覧", favorites_path, class: "block text-base font-semibold tracking-wide hover:text-green-600 transition" %>
+
+          <% if user_signed_in? %>
+            <%= link_to "マイアカウントページ", profile_path(current_user),
+            class: "block text-base font-semibold tracking-wide hover:text-green-600 transition" %>
+
+            <p class="text-sm text-gray-500 mt-2">ようこそ、<%= current_user.name %> さん！</p>
+            <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
+                class: "mt-2 inline-block px-4 py-2 bg-gray-800 text-white rounded-full hover:bg-gray-700 transition" %>
+          <% else %>
+            <%= link_to "ログイン", new_user_session_path, class: "block text-base font-semibold hover:text-green-600" %>
+            <%= link_to "新規登録", new_user_registration_path, class: "block text-base font-semibold hover:text-green-600" %>
+          <% end %>
+        </div>
       </div>
+    </header>
 
-      <!-- ナビゲーションメニュー -->
-      <nav class="flex space-x-6 text-lg font-medium">
-        <%= link_to "ルート一覧", routes_path, class: "hover:text-green-600" %>
-        <%= link_to "自転車紹介ページへ", bikes_path, class: "hover:text-green-600" %>
-        <%= link_to "お気に入りルート一覧", favorites_path, class: "hover:text-green-600" %>
-
-        <% if user_signed_in? %>
-          <%= link_to "マイアカウントページ", profile_path(current_user), class: "hover:text-green-600" %>
-        <% else %>
-          <%= link_to "ログイン", new_user_session_path, class: "hover:text-green-600" %>
-          <%= link_to "新規登録", new_user_registration_path, class: "hover:text-green-600" %>
-        <% end %>
-      </nav>
-
-      <!-- ユーザー情報 -->
-      <div class="text-right">
-        <% if user_signed_in? %>
-          <p class="text-sm text-gray-600">ようこそ、<br><%= current_user.name %> さん！</p>
-          <%= button_to "ログアウト", destroy_user_session_path, method: :delete,
-                      class: "mt-1 inline-block px-4 py-2 bg-gray-600 text-white text-sm rounded hover:bg-gray-700" %>
-        <% end %>
-      </div>
-
-
-    </div>
-  </div>
-</header>
 
 
    <%= yield %>
