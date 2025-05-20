@@ -32,6 +32,7 @@ document.addEventListener("turbo:load", () => {
   // 🟦 new/edit ページ
   if (pageType === "new" || pageType === "edit") {
     let waypoints = [];
+    let markerHistory = []; // マーカーの履歴を保存する配列
 
     // 編集ページの場合、既存のポイントを読み込み
     const hiddenInput = document.getElementById("waypoints");
@@ -46,6 +47,8 @@ document.addEventListener("turbo:load", () => {
           });
           drawPolyline();
           map.fitBounds(waypoints.map(p => [p.lat, p.lng]));
+          // 初期状態を履歴に保存
+          markerHistory.push([...waypoints]);
         }
       } catch (e) {
         console.warn("🛑 JSON parse error:", e);
@@ -56,6 +59,7 @@ document.addEventListener("turbo:load", () => {
     map.on("click", function (e) {
       const latlng = [e.latlng.lat, e.latlng.lng];
       waypoints.push({ lat: latlng[0], lng: latlng[1] });
+      markerHistory.push([...waypoints]); // 履歴に追加
 
       L.marker(latlng).addTo(map).bindPopup(`地点 ${waypoints.length}`).openPopup();
       drawPolyline();
@@ -69,6 +73,7 @@ document.addEventListener("turbo:load", () => {
     if (resetButton) {
       resetButton.addEventListener("click", () => {
         waypoints = [];
+        markerHistory = []; // 履歴もクリア
         hiddenInput.value = "";
         map.eachLayer((layer) => {
           if (layer instanceof L.Marker || layer instanceof L.Polyline) {
@@ -79,6 +84,40 @@ document.addEventListener("turbo:load", () => {
           maxZoom: 19,
           attribution: "© OpenStreetMap",
         }).addTo(map);
+      });
+    }
+
+    // ひとつ戻るボタン処理
+    const undoButton = document.getElementById("undoMarker");
+    if (undoButton) {
+      undoButton.addEventListener("click", () => {
+        if (markerHistory.length > 1) {
+          // 現在の状態を削除
+          markerHistory.pop();
+          // 一つ前の状態を取得
+          waypoints = [...markerHistory[markerHistory.length - 1]];
+
+          // マップをクリア
+          map.eachLayer((layer) => {
+            if (layer instanceof L.Marker || layer instanceof L.Polyline) {
+              map.removeLayer(layer);
+            }
+          });
+          L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+            maxZoom: 19,
+            attribution: "© OpenStreetMap",
+          }).addTo(map);
+
+          // 一つ前の状態を再描画
+          waypoints.forEach((p, i) => {
+            const latlng = [p.lat, p.lng];
+            L.marker(latlng).addTo(map).bindPopup(`地点 ${i + 1}`);
+          });
+          drawPolyline();
+
+          // hiddenに反映
+          if (hiddenInput) hiddenInput.value = JSON.stringify(waypoints);
+        }
       });
     }
 
